@@ -21,5 +21,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: org.thymeleaf:thymeleaf:Release" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Tomcat 9.0.31" level="application_server_libraries" />
+    <orderEntry type="library" name="org.apache.commons:commons-lang3:3.3" level="project" />
+    <orderEntry type="library" name="de.mkammerer:argon2-jvm:2.6" level="project" />
+    <orderEntry type="library" name="commons-validator:commons-validator:1.6" level="project" />
   </component>
 </module>

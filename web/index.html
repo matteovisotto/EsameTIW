@@ -1,0 +1,24 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+   <!-- <script src="https://code.jquery.com/jquery-3.5.0.min.js" data-th-src="@{https://code.jquery.com/jquery-3.5.0.min.js}"></script>-->
+    <link id="mainCssLink" rel="stylesheet" type="text/css" href="css/style.css" data-th-href="@{/css/style.css}"/>
+    <!--<script data-th-src="@{/js/style.js}" src="../js/style.js" crossorigin="anonymous"></script>-->
+    <title>Login</title>
+</head>
+<body>
+<div class="login-form-container">
+    <h2>Login to your account</h2>
+    <div class="alert alert-danger" data-th-class="${'alert alert-' + errorMessage.getType()}" data-th-if="${errorMessage.isVisible()}" data-th-text="${errorMessage.getContent()}">Invalid login</div>
+    <form class="form login-form" method="POST" action="index.html" data-th-action="@{/login}">
+        <div class="form-group">
+            <input class="form-control" type="text" name="username" placeholder="Username" />
+            <input class="form-control" type="password" name="password" placeholder="Password" />
+        </div>
+        <input type="submit" class="btn btn-primary btn-login" value="Login" />
+    </form>
+    <p>Do not have an account? <a href="WEB-INF/register.html" data-th-href="@{/register}" class="login-link">Register here!</a></p>
+</div>
+</body>
+</html>
+
