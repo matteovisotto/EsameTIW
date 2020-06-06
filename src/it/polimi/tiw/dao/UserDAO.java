@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.NoSuchElementException;
 
 public class UserDAO {
-    private Connection con;
+    private final Connection con;
 
     public UserDAO(Connection connection) {
         this.con = connection;

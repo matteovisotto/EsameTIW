@@ -19,7 +19,7 @@
         <h1 align="center">Welcome <span data-th-text="${user.getUsername()}">username</span></h1>
         <div class="row">
             <div class="col-4">
-                <h2 style="text-align:center">Available campaigns</h2>
+                <h2 style="text-align:center">Your meetings</h2>
                 <table class="table table-gray">
                     <thead>
                     <tr>
@@ -29,16 +29,17 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr data-th-each="c:${userAvailableCampaigns}">
-                        <td data-th-text="${c.getName()}"></td>
-                        <td data-th-text="${c.getClient()}"></td>
-                        <td><a href="gallery.html" data-th-href="@{/worker/campaign(id=${c.getId()})}" class="btn btn-outline-primary"><i class="fas fa-eye"></i></i></a></td>
+                    <tr data-th-each="c:${userMadeMeetings}">
+                        <td data-th-text="${c.getTitle()}"></td>
+                        <td data-th-text="${c.getDate()}"></td>
+                        <td data-th-text="${c.getDuration()}"></td>
+                        <td data-th-text="${c.getMaxParticipants()}"></td>
                     </tr>
                     </tbody>
                 </table>
             </div>
             <div class="col-4">
-                <h2 style="text-align:center">Your campaigns</h2>
+                <h2 style="text-align:center">Available meetings</h2>
                 <table class="table table-gray">
                     <thead>
                     <tr>
@@ -49,23 +50,25 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr data-th-each="c:${userJoinedCampaigns}">
-                        <td data-th-text="${c.getName()}"></td>
-                        <td data-th-text="${c.getClient()}"></td>
-                        <td><p class="badge badge-warning" data-th-class="${'badge badge-' + c.getBadge()}" data-th-text="${c.getState().toUpperCase()}"></p></td>
-                        <td><a href="gallery.html" data-th-href="@{/worker/campaign(id=${c.getId()})}" class="btn btn-outline-primary"><i class="fas fa-eye"></i></i></a></td>
+                    <tr data-th-each="c:${userAvailableMeetings}">
+                        <td data-th-text="${c.getTitle()}"></td>
+                        <td data-th-text="${c.getDate()}"></td>
+                        <td data-th-text="${c.getDuration()}"></td>
+                        <td data-th-text="${c.getMaxParticipants()}"></td>
                     </tr>
                     </tbody>
                 </table>
             </div>
             <div class="col-4">
-                <h2>Add new campaign</h2>
+                <h2>Create new meeting</h2>
                 <div class="alert alert-danger" data-th-class="${'alert alert-' + campaignAlert.getType()}" data-th-if="${campaignAlert.isVisible()}" data-th-utext="${campaignAlert.getContent()}">General error</div>
-                <form class="form" method="POST" action="" data-th-action="@{manager/createCampaign}">
-                    <label>Name</label>
-                    <input type="text" class="form-control" name="campaignName"/>
-                    <label>Client</label>
-                    <input type="text" class="form-control" name="campaignClient"/>
+                <form class="form" method="POST" action="" data-th-action="@{meetingChooseParticipants}">
+                    <label>Title</label>
+                    <input type="text" class="form-control" name="meetingName"/>
+                    <label>Date</label>
+                    <input type="time" step="1" class="form-control" name="meetingDate">
+                    <label>Duration (in minutes)</label>
+                    <input type="number" class="form-control" name="meetingDuration"/>
                     <input type="submit" class="btn btn-success" value="Create"/>
                 </form>
             </div>

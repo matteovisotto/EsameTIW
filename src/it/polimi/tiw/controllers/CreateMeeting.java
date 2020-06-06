@@ -4,6 +4,7 @@ import it.polimi.tiw.beans.Alert;
 import it.polimi.tiw.beans.Meeting;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.MeetingsDAO;
+import it.polimi.tiw.utility.Utility;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -20,10 +21,18 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
-@WebServlet("/home")
-public class Home extends HttpServlet {
+import static java.lang.String.format;
+
+@WebServlet("/home/createMeeting")
+public class CreateMeeting extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private Connection connection = null;
     private TemplateEngine templateEngine;
@@ -54,29 +63,45 @@ public class Home extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        String path = "/home.html";
-        ServletContext servletContext = getServletContext();
-        final WebContext ctx = new WebContext(req, resp, servletContext, req.getLocale());
-        User user = (User) req.getSession().getAttribute("user");
-        MeetingsDAO meetingsDAO = new MeetingsDAO(connection);
-        List<Meeting> meetings, invitedMeetings;
-        try{
-            meetings = meetingsDAO.getCreatedMeetings(user.getId());
-            invitedMeetings = meetingsDAO.getInvitedMeetings(user.getId());
-        } catch (SQLException e){
-            resp.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in reading data");
-            return;
-        }
-        ctx.setVariable("user", user);
-        ctx.setVariable("userMadeMeetings", meetings);
-        ctx.setVariable("userAvailableMeetings", invitedMeetings);
-        //ctx.setVariable("campaignAlert", req.getSession().getAttribute("campaignAlert"));
-        templateEngine.process(path, ctx, resp.getWriter());
+        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
+        User user = (User) req.getSession().getAttribute("user");
+        Alert alert = (Alert)req.getSession().getAttribute("meetingAlert");
+        MeetingsDAO meetingsDAO = new MeetingsDAO(connection);
+
+        if(!Utility.paramExists(req, resp, new ArrayList<>(Arrays.asList("meetingName", "meetingDate","meetingDuration")))) return;
+
+        String name = req.getParameter("meetingName");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        int duration;
+        try{
+            duration = Integer.parseInt(req.getParameter("meetingDuration"));
+            if (duration <= 5 || duration >= (24 * 60)) throw new IllegalArgumentException();
+        } catch (Exception e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        Date date, currentTime = new Date();
+        try{
+            date = simpleDateFormat.parse(req.getParameter("meetingDate"));
+            long milliseconds = (currentTime.getTime()-date.getTime());
+            if (milliseconds <= 0) throw new IllegalArgumentException();
+        } catch (Exception e){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+   /*     try{
+        } catch (SQLException e){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        String path = getServletContext().getContextPath() + "/manager/campaign?id="+id;
+        resp.sendRedirect(path);*/
     }
 
     @Override
