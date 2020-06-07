@@ -2,6 +2,7 @@ package it.polimi.tiw.beans;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Meeting{
@@ -9,6 +10,16 @@ public class Meeting{
     private Date dateTime;
     private int duration;
     private int maxParticipants;
+
+    public ArrayList<Integer> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(ArrayList<Integer> participants) {
+        this.participants = participants;
+    }
+
+    private ArrayList<Integer> participants;
 
     public Meeting() {
     }

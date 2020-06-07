@@ -8,6 +8,7 @@ import javax.servlet.http.Cookie;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
@@ -83,6 +84,22 @@ public class UserDAO {
                     user.setUsername(StringEscapeUtils.unescapeJava(result.getString("username")));
                     return user;
                 }
+            }
+        }
+    }
+
+    public ArrayList<User> getAllUsers() throws SQLException {
+        String query = "SELECT  * FROM user";
+        ArrayList<User> list = new ArrayList<>();
+        try (PreparedStatement pstatement = con.prepareStatement(query);) {
+            try (ResultSet result = pstatement.executeQuery();) {
+                while (result.next()){
+                    User user = new User();
+                    user.setId(result.getInt("id"));
+                    user.setUsername(StringEscapeUtils.unescapeJava(result.getString("username")));
+                    list.add(user);
+                }
+                return list;
             }
         }
     }

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invitations</title>
+    <link id="mainCssLink" rel="stylesheet" type="text/css" href="/css/style.css" data-th-href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+    <div class="navbar">
+        <a href="home.html" class="active" data-th-href="@{/home}">Home</a>
+        <div class="navbar-right">
+            <a href="/index.html" data-th-href="@{/logout}">Logout</a>
+        </div>
+    </div>
+    <div class="page-content">
+        <div class="col-12">
+            <h2 style="text-align:center">Available users</h2>
+            <form method="POST" action="" data-th-action="@{/home/createMeeting}">
+                <div class="row" data-th-each="c:${availableUsers}">
+                    <label data-th-for="${c.getId()}" data-th-text="${c.getUsername()}"></label>
+                    <input data-th-id="${c.getId()}" type="checkbox" name="invitations" data-th-value="${c.getId()}"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

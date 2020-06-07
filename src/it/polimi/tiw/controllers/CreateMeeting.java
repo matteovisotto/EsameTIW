@@ -4,6 +4,7 @@ import it.polimi.tiw.beans.Alert;
 import it.polimi.tiw.beans.Meeting;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.MeetingsDAO;
+import it.polimi.tiw.dao.UserDAO;
 import it.polimi.tiw.utility.Utility;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -24,10 +25,9 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -62,46 +62,83 @@ public class CreateMeeting extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
-        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        String path = "/createMeeting.html";
+        ServletContext servletContext = getServletContext();
+        final WebContext ctx = new WebContext(req, resp, servletContext, req.getLocale());
+        /*Alert errorMessage = new Alert(false, Alert.DANGER, "");
+        if(req.getSession().getAttribute("loginResult") == null) {
+            errorMessage.hide();
+        } else if((boolean)req.getSession().getAttribute("loginResult")) {
+            User u = (User) req.getSession().getAttribute("user");
+            String target = getServletContext().getContextPath() + "/home";
+            resp.sendRedirect(target);
+        } else {
+            errorMessage.setContent("Invalid credential");
+            errorMessage.show();
+        }*/
+       // ctx.setVariable("errorMessage", errorMessage);
+        UserDAO userDAO = new UserDAO(connection);
+        ArrayList<User> list;
+        try {
+            list = userDAO.getAllUsers();
+            list.removeIf(user -> user.getId() == ((User)req.getSession().getAttribute("user")).getId());
+        } catch (SQLException throwables) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); return;
+        }
+        ctx.setVariable("availableUsers", list);
+        templateEngine.process(path, ctx, resp.getWriter());
 
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute("user");
-        Alert alert = (Alert)req.getSession().getAttribute("meetingAlert");
+      //  Alert alert = (Alert)req.getSession().getAttribute("meetingAlert");
         MeetingsDAO meetingsDAO = new MeetingsDAO(connection);
 
-        if(!Utility.paramExists(req, resp, new ArrayList<>(Arrays.asList("meetingName", "meetingDate","meetingDuration")))) return;
+        if(!Utility.paramExists(req, resp, new ArrayList<>(Collections.singletonList("invitations")))) return;
 
-        String name = req.getParameter("meetingName");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        int duration;
+        String[] invitations = req.getParameterValues("invitations");
+        ArrayList<Integer> userIds;
         try{
-            duration = Integer.parseInt(req.getParameter("meetingDuration"));
-            if (duration <= 5 || duration >= (24 * 60)) throw new IllegalArgumentException();
+            userIds = Arrays.stream(invitations).distinct().map(Integer::parseInt).collect(Collectors.toCollection(ArrayList::new));
         } catch (Exception e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        Date date, currentTime = new Date();
-        try{
-            date = simpleDateFormat.parse(req.getParameter("meetingDate"));
-            long milliseconds = (currentTime.getTime()-date.getTime());
-            if (milliseconds <= 0) throw new IllegalArgumentException();
-        } catch (Exception e){
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+        Meeting meeting = user.getPendingMeeting();
+        if (meeting == null || userIds.size() > meeting.getMaxParticipants() || userIds.size() <= 0){
+            // segnala errore TODO
+            user.setNumTries((short) (user.getNumTries() + 1));
+            if (user.getNumTries() >= 3) {
+                //risposta diversa TODO
+                user.setNumTries((short)0);
+                user.setPendingMeeting(null);
+            }
+        }
+        else {
+            for (Integer i : userIds) {
+                try {
+                    if (!meetingsDAO.existsUser(i)) {
+                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST); return;
+                    }
+                } catch (SQLException throwables) {
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); return;
+                }
+
+            }
+            meeting.setParticipants(userIds);
+            try {
+                meetingsDAO.createMeeting(meeting.getTitle(), meeting.getMaxParticipants(), meeting.getDateTime(), meeting.getDuration(), user.getId(), meeting.getParticipants());
+            } catch (SQLException throwables) {
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+            user.setPendingMeeting(null);
         }
 
-   /*     try{
-        } catch (SQLException e){
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-        String path = getServletContext().getContextPath() + "/manager/campaign?id="+id;
-        resp.sendRedirect(path);*/
+        //resp.sendRedirect(getServletContext().getContextPath() + "/home/createMeeting");
+
     }
 
     @Override
