@@ -16,7 +16,7 @@ public class MeetingsDAO {
     }
 
     public ArrayList<Meeting> getCreatedMeetings(int id) throws SQLException, NoSuchElementException {
-        String query = "SELECT * FROM meetings WHERE id = ?";
+        String query = "SELECT * FROM meetings WHERE creatorid = ?";
         try (PreparedStatement pstatement = con.prepareStatement(query);) {
             pstatement.setInt(1, id);
             try (ResultSet result = pstatement.executeQuery();) {
@@ -25,7 +25,7 @@ public class MeetingsDAO {
                     Meeting meeting = new Meeting();
                     meeting.setTitle(StringEscapeUtils.unescapeJava(result.getString("title")));
                     meeting.setMaxParticipants(result.getInt("maxParticipants"));
-                    meeting.setDateTime(result.getTimestamp("datetime"));
+                    meeting.setDateTime(result.getTimestamp("timestamp"));
                     meeting.setDuration(result.getInt("duration"));
                     meetingList.add(meeting);
                 }
@@ -45,22 +45,11 @@ public class MeetingsDAO {
                     Meeting meeting = new Meeting();
                     meeting.setTitle(StringEscapeUtils.unescapeJava(result.getString("title")));
                     meeting.setMaxParticipants(result.getInt("maxParticipants"));
-                    meeting.setDateTime(result.getTimestamp("datetime"));
+                    meeting.setDateTime(result.getTimestamp("timestamp"));
                     meeting.setDuration(result.getInt("duration"));
                     meetingList.add(meeting);
                 }
                 return meetingList;
-            }
-
-        }
-    }
-
-    public boolean existsUser(int id) throws SQLException {
-        String query = "SELECT username FROM user WHERE id = ?";
-        try (PreparedStatement pstatement = con.prepareStatement(query);) {
-            pstatement.setInt(1, id);
-            try (ResultSet result = pstatement.executeQuery();) {
-                return result.isBeforeFirst();
             }
 
         }

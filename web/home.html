@@ -21,15 +21,16 @@
                 <table class="table table-gray">
                     <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Client</th>
-                        <th>Details</th>
+                        <th>Title</th>
+                        <th>Date</th>
+                        <th>Duration</th>
+                        <th>Max Participants</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr data-th-each="c:${userMadeMeetings}">
                         <td data-th-text="${c.getTitle()}"></td>
-                        <td data-th-text="${c.getDate()}"></td>
+                        <td data-th-text="${c.getDateTime()}"></td>
                         <td data-th-text="${c.getDuration()}"></td>
                         <td data-th-text="${c.getMaxParticipants()}"></td>
                     </tr>
@@ -41,16 +42,16 @@
                 <table class="table table-gray">
                     <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Client</th>
-                        <th>State</th>
-                        <th>Details</th>
+                        <th>Title</th>
+                        <th>Date</th>
+                        <th>Duration</th>
+                        <th>Max Participants</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr data-th-each="c:${userAvailableMeetings}">
                         <td data-th-text="${c.getTitle()}"></td>
-                        <td data-th-text="${c.getDate()}"></td>
+                        <td data-th-text="${c.getDateTime()}"></td>
                         <td data-th-text="${c.getDuration()}"></td>
                         <td data-th-text="${c.getMaxParticipants()}"></td>
                     </tr>

@@ -119,7 +119,8 @@ public class CreateMeeting extends HttpServlet {
         else {
             for (Integer i : userIds) {
                 try {
-                    if (!meetingsDAO.existsUser(i)) {
+                    UserDAO userDAO = new UserDAO(connection);
+                    if (!userDAO.existsUser(i)) {
                         resp.sendError(HttpServletResponse.SC_BAD_REQUEST); return;
                     }
                 } catch (SQLException throwables) {

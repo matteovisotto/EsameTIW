@@ -18,8 +18,8 @@
             <h2 style="text-align:center">Available users</h2>
             <form method="POST" action="" data-th-action="@{/home/createMeeting}">
                 <div class="row" data-th-each="c:${availableUsers}">
+                    <input class="inputGroup" data-th-id="${c.getId()}" type="checkbox" name="invitations" data-th-value="${c.getId()}"/>
                     <label data-th-for="${c.getId()}" data-th-text="${c.getUsername()}"></label>
-                    <input data-th-id="${c.getId()}" type="checkbox" name="invitations" data-th-value="${c.getId()}"/>
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
