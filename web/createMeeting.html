@@ -14,16 +14,17 @@
         </div>
     </div>
     <div class="page-content">
-        <div class="col-12">
             <h2 style="text-align:center">Available users</h2>
-            <form method="POST" action="" data-th-action="@{/home/createMeeting}">
-                <div class="row" data-th-each="c:${availableUsers}">
-                    <input class="inputGroup" data-th-id="${c.getId()}" type="checkbox" name="invitations" data-th-value="${c.getId()}"/>
+        <div class="row"><div class="col-12"><div class="alert alert-danger" data-th-class="${'alert alert-' + meetingAlert.getType()}" data-th-if="${meetingAlert.isVisible()}" data-th-utext="${meetingAlert.getContent()}">General error</div></div></div>
+        <form class="checkbox-form" method="POST" action="" data-th-action="@{/home/createMeeting}">
+                <div class="inputGroup" data-th-each="c:${availableUsers}">
+                    <input data-th-id="${c.getId()}" type="checkbox" name="invitations" data-th-value="${c.getId()}"/>
                     <label data-th-for="${c.getId()}" data-th-text="${c.getUsername()}"></label>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <div class="row" style="text-align: center;">
+                    <button type="submit" class="btn btn-primary centered">Submit</button>
+                </div>
             </form>
-        </div>
     </div>
 </div>
 </body>

@@ -65,18 +65,13 @@ public class CreateMeeting extends HttpServlet {
         String path = "/createMeeting.html";
         ServletContext servletContext = getServletContext();
         final WebContext ctx = new WebContext(req, resp, servletContext, req.getLocale());
-        /*Alert errorMessage = new Alert(false, Alert.DANGER, "");
-        if(req.getSession().getAttribute("loginResult") == null) {
-            errorMessage.hide();
-        } else if((boolean)req.getSession().getAttribute("loginResult")) {
-            User u = (User) req.getSession().getAttribute("user");
-            String target = getServletContext().getContextPath() + "/home";
-            resp.sendRedirect(target);
+        Alert meetingAlert;
+        if(req.getSession().getAttribute("meetingAlert")==null){
+            meetingAlert = new Alert(false, Alert.DANGER, "");
+            req.getSession().setAttribute("meetingAlert", meetingAlert);
         } else {
-            errorMessage.setContent("Invalid credential");
-            errorMessage.show();
-        }*/
-       // ctx.setVariable("errorMessage", errorMessage);
+            meetingAlert = (Alert) req.getSession().getAttribute("meetingAlert");
+        }
         UserDAO userDAO = new UserDAO(connection);
         ArrayList<User> list;
         try {
@@ -85,6 +80,7 @@ public class CreateMeeting extends HttpServlet {
         } catch (SQLException throwables) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); return;
         }
+        ctx.setVariable("meetingAlert", meetingAlert);
         ctx.setVariable("availableUsers", list);
         templateEngine.process(path, ctx, resp.getWriter());
 
@@ -93,7 +89,7 @@ public class CreateMeeting extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute("user");
-      //  Alert alert = (Alert)req.getSession().getAttribute("meetingAlert");
+        Alert alert = (Alert)req.getSession().getAttribute("meetingAlert");
         MeetingsDAO meetingsDAO = new MeetingsDAO(connection);
 
         if(!Utility.paramExists(req, resp, new ArrayList<>(Collections.singletonList("invitations")))) return;
@@ -107,13 +103,19 @@ public class CreateMeeting extends HttpServlet {
             return;
         }
         Meeting meeting = user.getPendingMeeting();
-        if (meeting == null || userIds.size() > meeting.getMaxParticipants() || userIds.size() <= 0){
-            // segnala errore TODO
+        if (meeting == null || userIds.size() >= meeting.getMaxParticipants() || userIds.size() <= 0){
+            alert.setType(Alert.DANGER);
+            alert.setContent(userIds.size() == 0 ? "Nessun utente selezionato." : "Troppi utenti selezionati.");
+            alert.show();
+            alert.dismiss();
             user.setNumTries((short) (user.getNumTries() + 1));
             if (user.getNumTries() >= 3) {
-                //risposta diversa TODO
                 user.setNumTries((short)0);
                 user.setPendingMeeting(null);
+                resp.sendRedirect(getServletContext().getContextPath() + "/creationFailed.html");
+            }
+            else {
+                resp.sendRedirect(getServletContext().getContextPath() + "/home/createMeeting");
             }
         }
         else {
