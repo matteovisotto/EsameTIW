@@ -18,7 +18,7 @@
         <div class="row"><div class="col-12"><div class="alert alert-danger" data-th-class="${'alert alert-' + meetingAlert.getType()}" data-th-if="${meetingAlert.isVisible()}" data-th-utext="${meetingAlert.getContent()}">General error</div></div></div>
         <form class="checkbox-form" method="POST" action="" data-th-action="@{/home/createMeeting}">
                 <div class="inputGroup" data-th-each="c:${availableUsers}">
-                    <input data-th-id="${c.getId()}" type="checkbox" name="invitations" data-th-value="${c.getId()}"/>
+                    <input data-th-with="id=${c.getId()}" data-th-id="${id}" type="checkbox" name="invitations" data-th-value="${id}" data-th-checked="${selected.contains(id)} ? 'checked'"/>
                     <label data-th-for="${c.getId()}" data-th-text="${c.getUsername()}"></label>
                 </div>
                 <div class="row" style="text-align: center;">

@@ -66,6 +66,7 @@ public class CreateMeeting extends HttpServlet {
         ServletContext servletContext = getServletContext();
         final WebContext ctx = new WebContext(req, resp, servletContext, req.getLocale());
         Alert meetingAlert;
+        if(((User) req.getSession().getAttribute("user")).getPendingMeeting() == null)   resp.sendRedirect(getServletContext().getContextPath() + "/home");
         if(req.getSession().getAttribute("meetingAlert")==null){
             meetingAlert = new Alert(false, Alert.DANGER, "");
             req.getSession().setAttribute("meetingAlert", meetingAlert);
@@ -80,6 +81,23 @@ public class CreateMeeting extends HttpServlet {
         } catch (SQLException throwables) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); return;
         }
+        String[] selected = null;
+        int i;
+        ArrayList<Integer> selectedIds = new ArrayList<>();
+        if (req.getParameter("selected") != null) {
+            selected = req.getParameter("selected").split(",");
+            for (String s : selected){
+                try{
+                    i = Integer.parseInt(s);
+                    if(i <= 0) throw new Exception();
+                    else selectedIds.add(i);
+                } catch (Exception e){
+                    resp.sendError(400);
+                    return;
+                }
+            }
+        }
+        ctx.setVariable("selected", selected == null ? new ArrayList<>() : selectedIds);
         ctx.setVariable("meetingAlert", meetingAlert);
         ctx.setVariable("availableUsers", list);
         templateEngine.process(path, ctx, resp.getWriter());
@@ -92,8 +110,23 @@ public class CreateMeeting extends HttpServlet {
         Alert alert = (Alert)req.getSession().getAttribute("meetingAlert");
         MeetingsDAO meetingsDAO = new MeetingsDAO(connection);
 
-        if(!Utility.paramExists(req, resp, new ArrayList<>(Collections.singletonList("invitations")))) return;
-
+        Map<String, String[]> parameterMap = req.getParameterMap();
+        if(!parameterMap.containsKey("invitations")){
+            if (user.getNumTries() > 3) {
+                user.setNumTries((short)0);
+                user.setPendingMeeting(null);
+                resp.sendRedirect(getServletContext().getContextPath() + "/creationFailed.html");
+            }
+            else {
+                user.setNumTries((short) (user.getNumTries() + 1));
+                alert.setType(Alert.DANGER);
+                alert.setContent("Nessun utente selezionato.");
+                alert.show();
+                alert.dismiss();
+                resp.sendRedirect(getServletContext().getContextPath() + "/home/createMeeting");
+            }
+            return;
+        }
         String[] invitations = req.getParameterValues("invitations");
         ArrayList<Integer> userIds;
         try{
@@ -109,19 +142,25 @@ public class CreateMeeting extends HttpServlet {
             alert.show();
             alert.dismiss();
             user.setNumTries((short) (user.getNumTries() + 1));
-            if (user.getNumTries() >= 3) {
+            if (user.getNumTries() > 3) {
                 user.setNumTries((short)0);
                 user.setPendingMeeting(null);
                 resp.sendRedirect(getServletContext().getContextPath() + "/creationFailed.html");
             }
             else {
-                resp.sendRedirect(getServletContext().getContextPath() + "/home/createMeeting");
+                StringBuilder s = new StringBuilder("/home/createMeeting?selected=");
+                for (int i : userIds){
+                    s.append(i);
+                    s.append(",");
+                }
+                s.deleteCharAt(s.length() - 1);
+                resp.sendRedirect(getServletContext().getContextPath() + s.toString());
             }
         }
         else {
+            UserDAO userDAO = new UserDAO(connection);
             for (Integer i : userIds) {
                 try {
-                    UserDAO userDAO = new UserDAO(connection);
                     if (!userDAO.existsUser(i)) {
                         resp.sendError(HttpServletResponse.SC_BAD_REQUEST); return;
                     }
@@ -138,6 +177,11 @@ public class CreateMeeting extends HttpServlet {
                 return;
             }
             user.setPendingMeeting(null);
+            alert.setType(Alert.SUCCESS);
+            alert.setContent("Meeting successfully created.");
+            alert.show();
+            alert.dismiss();
+            resp.sendRedirect(getServletContext().getContextPath() + "/home");
         }
 
         //resp.sendRedirect(getServletContext().getContextPath() + "/home/createMeeting");

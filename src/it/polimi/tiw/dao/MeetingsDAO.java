@@ -16,7 +16,7 @@ public class MeetingsDAO {
     }
 
     public ArrayList<Meeting> getCreatedMeetings(int id) throws SQLException, NoSuchElementException {
-        String query = "SELECT * FROM meetings WHERE creatorid = ?";
+        String query = "SELECT * FROM meetings WHERE creatorid = ? AND timestamp > NOW()";
         try (PreparedStatement pstatement = con.prepareStatement(query);) {
             pstatement.setInt(1, id);
             try (ResultSet result = pstatement.executeQuery();) {
@@ -36,7 +36,7 @@ public class MeetingsDAO {
     }
 
     public ArrayList<Meeting> getInvitedMeetings(int id) throws SQLException, NoSuchElementException {
-        String query = "SELECT * FROM meetings JOIN invitations ON meetings.id = invitations.meetingid WHERE userid = ?";
+        String query = "SELECT * FROM meetings JOIN invitations ON meetings.id = invitations.meetingid WHERE userid = ? AND timestamp > NOW()";
         try (PreparedStatement pstatement = con.prepareStatement(query);) {
             pstatement.setInt(1, id);
             try (ResultSet result = pstatement.executeQuery();) {

@@ -61,6 +61,13 @@ public class Home extends HttpServlet {
         ServletContext servletContext = getServletContext();
         final WebContext ctx = new WebContext(req, resp, servletContext, req.getLocale());
         User user = (User) req.getSession().getAttribute("user");
+        Alert meetingAlert;
+        if(req.getSession().getAttribute("meetingAlert")==null){
+            meetingAlert = new Alert(false, Alert.DANGER, "");
+            req.getSession().setAttribute("meetingAlert", meetingAlert);
+        } else {
+            meetingAlert = (Alert) req.getSession().getAttribute("meetingAlert");
+        }
         MeetingsDAO meetingsDAO = new MeetingsDAO(connection);
         List<Meeting> meetings, invitedMeetings;
         try{
@@ -73,7 +80,7 @@ public class Home extends HttpServlet {
         ctx.setVariable("user", user);
         ctx.setVariable("userMadeMeetings", meetings);
         ctx.setVariable("userAvailableMeetings", invitedMeetings);
-        //ctx.setVariable("campaignAlert", req.getSession().getAttribute("campaignAlert"));
+        ctx.setVariable("meetingAlert", meetingAlert);
         templateEngine.process(path, ctx, resp.getWriter());
     }
 
@@ -81,7 +88,6 @@ public class Home extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute("user");
         Alert alert = (Alert)req.getSession().getAttribute("meetingAlert");
-        MeetingsDAO meetingsDAO = new MeetingsDAO(connection);
 
         if(!Utility.paramExists(req, resp, new ArrayList<>(Arrays.asList("meetingName", "meetingDate","meetingTime","meetingDuration","meetingMaxParticipants")))) return;
 

@@ -612,9 +612,9 @@ p, h1, h2, h3, h4, h5, h6{
 /* Alerts */
 .alert{
     padding-top:10px;
+    padding-bottom: 10px;
     padding-left: 15px;
     padding-right: 15px;
-    margin-bottom: 3px;
     margin-top: 5px;
     border: 1px solid;
     border-radius: 5px;
