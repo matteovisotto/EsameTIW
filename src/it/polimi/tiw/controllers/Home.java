@@ -82,6 +82,7 @@ public class Home extends HttpServlet {
         ctx.setVariable("userAvailableMeetings", invitedMeetings);
         ctx.setVariable("meetingAlert", meetingAlert);
         templateEngine.process(path, ctx, resp.getWriter());
+        if(meetingAlert.isDismissible()) meetingAlert.hide();
     }
 
     @Override

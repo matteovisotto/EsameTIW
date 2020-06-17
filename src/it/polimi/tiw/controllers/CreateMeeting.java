@@ -101,6 +101,7 @@ public class CreateMeeting extends HttpServlet {
         ctx.setVariable("meetingAlert", meetingAlert);
         ctx.setVariable("availableUsers", list);
         templateEngine.process(path, ctx, resp.getWriter());
+        if(meetingAlert.isDismissible()) meetingAlert.hide();
 
     }
 
