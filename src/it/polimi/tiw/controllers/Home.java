@@ -56,11 +56,15 @@ public class Home extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
         String path = "/home.html";
         ServletContext servletContext = getServletContext();
         final WebContext ctx = new WebContext(req, resp, servletContext, req.getLocale());
         User user = (User) req.getSession().getAttribute("user");
+        if (user == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        if (user.getPendingMeeting() != null) user.setPendingMeeting(null);
         Alert meetingAlert;
         if(req.getSession().getAttribute("meetingAlert")==null){
             meetingAlert = new Alert(false, Alert.DANGER, "");
