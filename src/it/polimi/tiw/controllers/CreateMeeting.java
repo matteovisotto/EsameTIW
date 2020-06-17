@@ -138,13 +138,17 @@ public class CreateMeeting extends HttpServlet {
         Meeting meeting = user.getPendingMeeting();
         if (meeting == null || userIds.size() >= meeting.getMaxParticipants() || userIds.size() <= 0){
             alert.setType(Alert.DANGER);
-            alert.setContent(userIds.size() == 0 ? "Nessun utente selezionato." : "Troppi utenti selezionati.");
+            String content = (meeting == null ? "Error in meeting creation. Please try again." :
+                    (userIds.size() == 0 ? "No user selected." :
+                            ("Too many users selected. Please remove at least " +  (userIds.size() - meeting.getMaxParticipants() + 1) + ".")));
+            alert.setContent(content);
             alert.show();
             alert.dismiss();
             user.setNumTries((short) (user.getNumTries() + 1));
             if (user.getNumTries() > 3) {
                 user.setNumTries((short)0);
                 user.setPendingMeeting(null);
+                alert.hide();
                 resp.sendRedirect(getServletContext().getContextPath() + "/creationFailed.html");
             }
             else {
@@ -183,8 +187,6 @@ public class CreateMeeting extends HttpServlet {
             alert.dismiss();
             resp.sendRedirect(getServletContext().getContextPath() + "/home");
         }
-
-        //resp.sendRedirect(getServletContext().getContextPath() + "/home/createMeeting");
 
     }
 

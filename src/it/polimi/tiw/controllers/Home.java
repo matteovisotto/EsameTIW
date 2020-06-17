@@ -99,7 +99,7 @@ public class Home extends HttpServlet {
             maxParticipants = Integer.parseInt(req.getParameter("meetingMaxParticipants"));
             if (duration <= 5 || duration >= (24 * 60) || maxParticipants < 2 || maxParticipants > 500) throw new IllegalArgumentException();
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            setError(alert, resp);
             return;
         }
         Date date, currentTime = new Date();
@@ -115,7 +115,7 @@ public class Home extends HttpServlet {
             long milliseconds = (calendar.getTime().getTime() - currentTime.getTime());
             if (milliseconds <= 0) throw new IllegalArgumentException();
         } catch (Exception e){
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            setError(alert, resp);
             return;
         }
         Meeting meeting = new Meeting();
@@ -124,8 +124,18 @@ public class Home extends HttpServlet {
         meeting.setTitle(name);
         meeting.setMaxParticipants(maxParticipants);
         user.setPendingMeeting(meeting);
+        alert.hide();
         resp.sendRedirect(getServletContext().getContextPath() + "/home/createMeeting");
 
+    }
+
+    private void setError(Alert alert, HttpServletResponse resp) throws IOException {
+        alert.setType(Alert.DANGER);
+        String content = "Invalid parameter. Please try again.";
+        alert.setContent(content);
+        alert.show();
+        alert.dismiss();
+        resp.sendRedirect(getServletContext().getContextPath()+ "/home");
     }
 
     @Override
