@@ -84,10 +84,15 @@ public class Register extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<String> paramList = new ArrayList<>(Arrays.asList("username", "password"));
+        List<String> paramList = new ArrayList<>(Arrays.asList("username", "password","checkPassword"));
         if(!Utility.paramExists(req, resp, paramList) || Utility.paramIsEmpty(req, resp, paramList)) return;
         String username = req.getParameter("username");
         String password = req.getParameter("password");
+        String checkPassword = req.getParameter("checkPassword");
+        if(!password.equals(checkPassword)){
+            setAlert(req,resp, Alert.DANGER,"Password and Confirm Password are different");
+            return;
+        }
         UserDAO userDAO = new UserDAO(connection);
         Alert alert = (Alert) req.getSession().getAttribute("registerResult");
 
