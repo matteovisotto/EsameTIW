@@ -113,10 +113,10 @@ public class CreateMeeting extends HttpServlet {
 
         Map<String, String[]> parameterMap = req.getParameterMap();
         if(!parameterMap.containsKey("invitations")){
-            if (user.getNumTries() > 3) {
+            if (user.getNumTries() >= 3) {
                 user.setNumTries((short)0);
                 user.setPendingMeeting(null);
-                resp.sendRedirect(getServletContext().getContextPath() + "/creationFailed.html");
+                resp.sendRedirect(getServletContext().getContextPath() + "/creationFailed");
             }
             else {
                 user.setNumTries((short) (user.getNumTries() + 1));
@@ -146,11 +146,11 @@ public class CreateMeeting extends HttpServlet {
             alert.show();
             alert.dismiss();
             user.setNumTries((short) (user.getNumTries() + 1));
-            if (user.getNumTries() > 3) {
+            if (user.getNumTries() >= 3) {
                 user.setNumTries((short)0);
                 user.setPendingMeeting(null);
                 alert.hide();
-                resp.sendRedirect(getServletContext().getContextPath() + "/creationFailed.html");
+                resp.sendRedirect(getServletContext().getContextPath() + "/creationFailed");
             }
             else {
                 StringBuilder s = new StringBuilder("/home/createMeeting?selected=");
