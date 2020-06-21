@@ -1,7 +1,5 @@
 package it.polimi.tiw.controllers;
 
-import it.polimi.tiw.beans.User;
-import it.polimi.tiw.dao.UserDAO;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
@@ -61,5 +59,16 @@ public class Logout extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         doGet(req, resp);
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException sqle) {
+        }
     }
 }

@@ -3,7 +3,6 @@ package it.polimi.tiw.controllers;
 import it.polimi.tiw.beans.Alert;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.UserDAO;
-import it.polimi.tiw.utility.Crypto;
 import it.polimi.tiw.utility.Utility;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -14,7 +13,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,7 +63,6 @@ public class Login extends HttpServlet {
         if(req.getSession().getAttribute("loginResult") == null) {
             errorMessage.hide();
         } else if((boolean)req.getSession().getAttribute("loginResult")) {
-            User u = (User) req.getSession().getAttribute("user");
             String target = getServletContext().getContextPath() + "/home";
             resp.sendRedirect(target);
         } else {

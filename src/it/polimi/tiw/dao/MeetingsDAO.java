@@ -1,7 +1,6 @@
 package it.polimi.tiw.dao;
 
 import it.polimi.tiw.beans.Meeting;
-import it.polimi.tiw.beans.User;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.sql.*;
@@ -10,7 +9,7 @@ import java.util.Date;
 import java.util.NoSuchElementException;
 
 public class MeetingsDAO {
-    private Connection con;
+    private final Connection con;
     public MeetingsDAO(Connection connection) {
         this.con = connection;
     }

@@ -11,13 +11,10 @@ import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -26,19 +23,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static it.polimi.tiw.utility.Utility.isValidMailAddress;
-
 @WebServlet("/register")
-@MultipartConfig(fileSizeThreshold = 6291456, // 6 MB
-        maxFileSize = 10485760L, // 10 MB
-        maxRequestSize = 20971520L // 20 MB
-)
 public class Register extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private Connection connection = null;
     private TemplateEngine templateEngine;
-    private static final String UPLOAD_DIR = "uploads/profileImages";
 
     @Override
     public void init() throws ServletException {
@@ -94,14 +84,7 @@ public class Register extends HttpServlet {
             return;
         }
         UserDAO userDAO = new UserDAO(connection);
-        Alert alert = (Alert) req.getSession().getAttribute("registerResult");
-
         try {
-            if(!userDAO.isUsernameFree(username)){
-                setAlert(req,resp, Alert.DANGER,"Account already exists.");
-                return;
-            }
-
             if(!userDAO.isUsernameFree(username)){
                 setAlert(req,resp, Alert.DANGER,"This username is already in use.");
                 return;

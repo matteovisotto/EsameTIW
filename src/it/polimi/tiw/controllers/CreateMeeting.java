@@ -5,7 +5,6 @@ import it.polimi.tiw.beans.Meeting;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.MeetingsDAO;
 import it.polimi.tiw.dao.UserDAO;
-import it.polimi.tiw.utility.Utility;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -22,14 +21,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.lang.String.format;
 
 @WebServlet("/home/createMeeting")
 public class CreateMeeting extends HttpServlet {

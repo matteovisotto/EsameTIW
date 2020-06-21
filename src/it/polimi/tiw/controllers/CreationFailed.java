@@ -1,34 +1,21 @@
 package it.polimi.tiw.controllers;
 
-import it.polimi.tiw.beans.Alert;
-import it.polimi.tiw.beans.Meeting;
 import it.polimi.tiw.beans.User;
-import it.polimi.tiw.dao.MeetingsDAO;
-import it.polimi.tiw.utility.Utility;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.util.*;
 
 @WebServlet("/creationFailed")
 public class CreationFailed extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private Connection connection = null;
     private TemplateEngine templateEngine;
 
     @Override
