@@ -80,6 +80,10 @@ public class Register extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         String checkPassword = req.getParameter("checkPassword");
+        if(!Utility.isValidMailAddress(username)){
+            setAlert(req,resp, Alert.DANGER,"The username must be a valid email address");
+            return;
+        }
         if(!password.equals(checkPassword)){
             setAlert(req,resp, Alert.DANGER,"Password and Confirm Password are different");
             return;
